@@ -12,6 +12,9 @@ public class User extends Subject implements Entry, Observer
 	private ArrayList<String> tweets;
 	// follower requirement in parent class
 	
+	private long creationTime;
+	private long lastUpdateTime;
+	
 	public User(String displayName, UserGroup parent) 
 	{
 		super();
@@ -33,6 +36,7 @@ public class User extends Subject implements Entry, Observer
 		}
 		this.parent.addEntry(this);
 		DataBase.getInsatnce().addEntry(this);
+		creationTime = lastUpdateTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -66,6 +70,7 @@ public class User extends Subject implements Entry, Observer
 	public void notifyMe(String post) 
 	{
 		feed.add(post);
+		lastUpdateTime = System.currentTimeMillis();
 	}
 
 	public void followUser(String userID)
@@ -79,6 +84,7 @@ public class User extends Subject implements Entry, Observer
 		feed.add(post);
 		tweets.add(post);
 		super.post(post);
+		lastUpdateTime = System.currentTimeMillis();
 	}
 	
 	public String toString()
@@ -96,6 +102,17 @@ public class User extends Subject implements Entry, Observer
 	public int accept(EntryVisitor vistor) 
 	{
 		return vistor.visit(this);
+	}
+
+	@Override
+	public long getCreationTime() 
+	{
+		return creationTime;
+	}
+	
+	public long getLastUpdateTime() 
+	{
+		return lastUpdateTime;
 	}
 
 }

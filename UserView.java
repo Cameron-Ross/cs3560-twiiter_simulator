@@ -1,6 +1,8 @@
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.ScrollPane;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -18,6 +20,7 @@ public class UserView
 	private JFrame frame;
 	private JLabel following;
 	private JLabel feed;
+	private JLabel info;
 	private JTextField tweetField;
 	
 	public UserView(User user)
@@ -63,6 +66,7 @@ public class UserView
 	{
 		String feedText = "<html>Feed:" + formatFeed() + "</html>";
 		feed.setText(feedText);
+		info.setText(getInfoText());
 	}
 	
 	private void createUserView()
@@ -81,10 +85,17 @@ public class UserView
 		// follow section
 		JPanel panel1 = new JPanel();
 		JButton follow = new JButton("Find User to Follow");
-		String idText = "<html>My Name: " + user.getDisplayName() + "<br>My ID: " + user.getID() + "</html>";
-		JLabel myID = new JLabel(idText);
-		follow.addActionListener(Admin.getInsatnce());
-		panel1.add(myID);
+		
+		// id section
+		// JLabel myID = new JLabel(idText);
+		
+		// updated section
+		info = new JLabel(getInfoText());
+		
+		
+		follow.addActionListener(Admin.getInstance());
+		// panel1.add(myID);
+		panel1.add(info);
 		panel1.add(follow);
 		frame.add(panel1);
 		
@@ -97,7 +108,7 @@ public class UserView
 		JPanel panel2 = new JPanel();
 		JButton tweet = new JButton("Tweet");
 		tweetField = new JTextField("Type Tweet",30);
-		tweet.addActionListener(Admin.getInsatnce());
+		tweet.addActionListener(Admin.getInstance());
 		panel2.add(tweetField);
 		panel2.add(tweet);
 		frame.add(panel2);
@@ -108,7 +119,7 @@ public class UserView
 		feed.setText(feedText);
 		JScrollPane scroll = new JScrollPane(feed);
 		frame.add(scroll, BorderLayout.EAST);
-		
+
 	}
 	
 	private String formatFollowing()
@@ -130,6 +141,19 @@ public class UserView
 		}
 		return result;
 	}
+	
+	private String getInfoText()
+	{
+		String idText = "<html>My Name: " + user.getDisplayName() + "<br>My ID: " + user.getID() + "<br>";
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy hh:mm:ss a");
+		String created = sdf.format(new Date(user.getCreationTime())); 
+		String updated = sdf.format(new Date(user.getLastUpdateTime())); 
+		String updateText = "Created: " + created + "<br>Last Updated: " + updated + "</html>";
+		
+		return idText + updateText;
+	}
+	
 	
 	
 }

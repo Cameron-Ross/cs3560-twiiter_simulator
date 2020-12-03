@@ -1,6 +1,8 @@
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 
 public class DataBase 
@@ -8,7 +10,7 @@ public class DataBase
 	private static final DataBase instance = new DataBase();
 	private ArrayList<Entry> entries;
 	private UserGroup root;
-	
+	 
 	private DataBase() 
 	{
 		entries = new ArrayList<Entry>();
@@ -104,5 +106,53 @@ public class DataBase
 		String output = df.format(total) + "%";
 		return output;
 	}
+	
+	public ArrayList<String> getInvalidIDs()
+	{
+		ArrayList<String> badIDs = new ArrayList<String>();
+		Set<String> ids = new HashSet<String>();
+		
+		for (int i = 0; i < ids.size(); i++) 
+		{
+			String id = entries.get(i).getID();
+			boolean added = ids.add(id);
+			// set cannot add duplicates
+			if(!added || id.contains(" "))
+			{
+				badIDs.add(id);
+			}
+		}
+		
+		return badIDs;
+	}
+	
+	public User getLastUpdatedUser()
+	{
+		User lastUpdated = null;
+		for(int i = 1; i < entries.size(); i++)
+		{
+			Entry e = entries.get(i);
+			boolean isUser = e.getClass().getName().equals("User");
+			if(isUser)
+			{
+				User currentUser = (User)e;
+				if(lastUpdated == null)
+				{
+					lastUpdated = currentUser;
+				}
+				else 
+				{
+					boolean bigger = currentUser.getLastUpdateTime() > lastUpdated.getLastUpdateTime();
+					if(bigger)
+					{
+						lastUpdated = currentUser;
+					}
+				}
+			}
+		}
+		return lastUpdated;
+	}
+	
+	
 
 }

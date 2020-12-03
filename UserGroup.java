@@ -6,6 +6,7 @@ public class UserGroup implements Entry
 	private String displayName;
 	private UserGroup parent;
 	private ArrayList<Entry> entries;
+	private long creationTime;
 	
 	public UserGroup(String displayName, UserGroup parent) 
 	{
@@ -25,6 +26,7 @@ public class UserGroup implements Entry
 		}
 		this.parent.addEntry(this);
 		DataBase.getInsatnce().addEntry(this);
+		creationTime = System.currentTimeMillis();
 	}
 	
 	public UserGroup(String displayName) 
@@ -33,7 +35,7 @@ public class UserGroup implements Entry
 		id = unique.substring(0,unique.length() / 2);
 		this.displayName = displayName;
 		entries = new ArrayList<Entry>();
-		parent = this;
+		parent = null;
 	}
 
 	@Override
@@ -73,5 +75,11 @@ public class UserGroup implements Entry
 	public String toString()
 	{
 		return displayName;
+	}
+
+	@Override
+	public long getCreationTime() 
+	{
+		return creationTime;
 	}
 }

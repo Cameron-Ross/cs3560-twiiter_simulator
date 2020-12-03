@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -15,7 +17,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 public class Admin extends JFrame implements ActionListener
 {
-	private static final Admin insatnce = new Admin();
+	private static final Admin instance = new Admin();
 	
 	private JTree tree;
     private JLabel idLabel;
@@ -32,9 +34,9 @@ public class Admin extends JFrame implements ActionListener
 		userViews = new ArrayList<UserView>();
 	}
 	
-	public static Admin getInsatnce()
+	public static Admin getInstance()
 	{
-		return insatnce;
+		return instance;
 	}
 	
 	public void Launch()
@@ -112,6 +114,10 @@ public class Admin extends JFrame implements ActionListener
 	    JButton showGroupTotal = new JButton("Show Group Total");
 	    JButton showMessageTotal = new JButton("Show Total Tweets");
 	    JButton showPositive = new JButton("Show Positive Percentage");
+	    
+	    JButton showInvalidIDs = new JButton("Show Invalid IDs");
+	    JButton showLastUpdatedUser = new JButton("Show Last Updated User");
+	    
 	    openUserView = new JButton("Open User View");
 	    idLabel = new JLabel("  ID");
         groupLabel = new JLabel("  Group ID");
@@ -125,11 +131,14 @@ public class Admin extends JFrame implements ActionListener
 	    showPositive.addActionListener(this);
 	    openUserView.addActionListener(this);
 	    
+	    showInvalidIDs.addActionListener(this);
+	    showLastUpdatedUser.addActionListener(this);
+	    
 	    addUser.setEnabled(false);
 	    addGroup.setEnabled(false);
 	    openUserView.setEnabled(false);
 	    
-	    JPanel panel = new JPanel(new GridLayout(4,2));
+	    JPanel panel = new JPanel(new GridLayout(6,2));
 	    
         panel.add(idLabel);
         panel.add(groupLabel);
@@ -140,6 +149,9 @@ public class Admin extends JFrame implements ActionListener
 	    panel.add(showGroupTotal);
 	    panel.add(showMessageTotal);
 	    panel.add(showPositive);
+	    
+	    panel.add(showInvalidIDs);
+	    panel.add(showLastUpdatedUser);
 	    
 	    add(panel,BorderLayout.EAST);
         add(pathLabel, BorderLayout.PAGE_START);
@@ -196,7 +208,6 @@ public class Admin extends JFrame implements ActionListener
 		{
 			UserView activeUserView = getActiveUserView();
 			String txt = "" + activeUserView.getUser().getDisplayName() + ": " + activeUserView.getTweetText();
-			//DataBase.getInsatnce().addTweet(txt);
 			activeUserView.getUser().post(txt);
 			activeUserView.clearTweetText();
 			updateNewsFeeds();
@@ -208,6 +219,30 @@ public class Admin extends JFrame implements ActionListener
 		else if(buttonPressed.equals("Show Total Tweets")) 
 		{
 			JOptionPane.showMessageDialog(null,"There are " + DataBase.getInsatnce().getTweetCount() + " tweets.");
+		}
+		else if(buttonPressed.equals("Show Invalid IDs")) 
+		{
+			ArrayList<String> invalidIDs = DataBase.getInsatnce().getInvalidIDs();
+			String message = "";
+			if(invalidIDs.size() == 0)
+			{
+				message = "All IDs are valid.";
+			}
+			else 
+			{
+				for(String id : invalidIDs)
+				{
+					message += (id + " is not a valid ID!\n");
+				}
+			}
+			JOptionPane.showMessageDialog(null,message);
+		}
+		else if(buttonPressed.equals("Show Last Updated User")) 
+		{
+			User user = DataBase.getInsatnce().getLastUpdatedUser();
+			String name = user.getDisplayName();
+			long time = user.getLastUpdateTime();
+			JOptionPane.showMessageDialog(null,"The last updated user was " + name + " at: " + formatDate(time) + "." );
 		}
 		
 	}
@@ -256,17 +291,6 @@ public class Admin extends JFrame implements ActionListener
 		return null;
 	}
 	
-	private UserView getOpenedUserView(User user)
-	{
-		for(UserView view : userViews)
-		{
-			if(view.getUser().equals(user))
-			{
-				return view;
-			}
-		}
-		return null;
-	}
 
 	private void updateNewsFeeds()
 	{
@@ -274,6 +298,13 @@ public class Admin extends JFrame implements ActionListener
 		{
 			view.updateFeed();
 		}
+	}
+	
+	private String formatDate(long time)
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy hh:mm:ss a");    
+		Date resultdate = new Date(time);
+		return sdf.format(resultdate);
 	}
 
 }

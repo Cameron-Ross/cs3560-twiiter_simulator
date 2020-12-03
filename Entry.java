@@ -5,4 +5,6 @@ public interface Entry extends Vistee
 	public String getDisplayName();
 	
 	public UserGroup getParent();
+	
+	public long getCreationTime();
 }

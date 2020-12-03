@@ -3,7 +3,7 @@ public class Driver
 	public static void main(String[] args) 
 	{
 		createDefaultUsers();
-		Admin.getInsatnce().Launch();
+		Admin.getInstance().Launch();
 	}
 	
 	private static void createDefaultUsers()
